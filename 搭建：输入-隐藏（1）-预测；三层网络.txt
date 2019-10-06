@@ -1,0 +1,46 @@
+import tensorflow as tf
+import numpy as np
+import matplotlib.pyplot as plt
+####################build layer############
+def add_layer (inputs,in_size,out_size,activation_function=None):
+    W=tf.Variable(tf.random_normal([in_size,out_size]))
+    biases=tf.Variable(tf.zeros([1,out_size])+0.1)
+    Wx_plus_b=tf.matmul(inputs,W)+biases
+    if activation_function is None:
+        outputs=Wx_plus_b
+    else:
+        outputs=activation_function(Wx_plus_b)
+    return outputs
+##########################################
+### ### ###  data
+x_data = np.linspace(-5,5,10000)[:,np.newaxis]
+noise = np.random.normal(0,0.05,x_data.shape)#(average,fangcha,shape)
+y_data = np.square(x_data)-7 + noise #Noneline
+### independent
+xs= tf.placeholder(tf.float32,[None,1])
+ys= tf.placeholder(tf.float32,[None,1])
+#########   code start##############
+l1=add_layer(xs,1,10,activation_function=tf.nn.relu)
+l2=add_layer(l1,10,10,activation_function=tf.nn.tanh)
+
+prediction = add_layer(l2,10,1,activation_function=None)
+
+###loss
+loss = tf.reduce_mean(tf.reduce_sum(tf.square(prediction-ys),reduction_indices=[1]))###reduction_indices  is xD;it's 1D now
+###train's way
+train = tf.train.GradientDescentOptimizer(0.005).minimize(loss)
+
+########    code end###############
+init = tf.global_variables_initializer()
+sess=tf.Session()
+sess.run(init)
+
+fig=plt.figure()
+ax=fig.add_subplot(1,1,1)
+ax.scatter(x_data,y_data)
+plt.show()
+
+for i in range(10001):
+    sess.run(train,feed_dict={xs:x_data,ys:y_data})
+    if i%2000 == 0 :
+        print(i,sess.run(loss,feed_dict={xs:x_data,ys:y_data}))

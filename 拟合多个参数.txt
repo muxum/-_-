@@ -1,0 +1,36 @@
+import numpy as np
+import tensorflow as tf
+#data create
+x_data1 =np.random.rand(100)
+x_data2 =np.random.rand(100)
+y_data=13*x_data1**(7*x_data2)+373
+#######code start#######
+w1=tf.Variable(tf.random_uniform([1],-1.,1.))
+w2=tf.Variable(tf.random_uniform([1],-1.,1.))
+biases = tf.Variable(tf.zeros([1]))
+y=w1*x_data1**(w2*x_data2)+biases
+
+###loss function
+loss = tf.reduce_mean(tf.square(y-y_data))
+###train's way
+optimizer2=tf.train.GradientDescentOptimizer(0.000001)
+optimizer1=tf.train.AdamOptimizer(0.00012)
+train2=optimizer2.minimize(loss)
+train1=optimizer1.minimize(loss)
+###init
+
+init = tf.initialize_all_variables()
+#######code end########
+###run
+sess=tf.Session()
+sess.run(init)
+k = 200001
+j=1000
+for T1 in range(k):
+    sess.run(train1)
+    if T1%j==0:
+        print(T1,sess.run(w1),sess.run(w2),sess.run(biases))
+""""for T2 in range(k//2):
+    sess.run(train2)# if T1%j==0:
+    if (T2+k//2)%j==0:
+        print(T2+k//2,sess.run(w1),sess.run(w2),sess.run(biases))"""
